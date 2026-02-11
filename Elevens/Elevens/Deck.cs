@@ -13,4 +13,39 @@ public class Deck {
             }
         }
     }
+    private void Shuffle()
+    {
+        int n = cards.Count;
+        for (int i = n - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+            Card temp = cards[i];
+            cards[i] = cards[j];
+            cards[j] = temp;
+        }
+    }
+ public List<Card> Deal(int numberOfCards)
+    {
+        Shuffle();
+
+        numberOfCards = Math.Min(numberOfCards, 9);
+
+        List<Card> hand = new List<Card>();
+
+        for (int i = 0; i < numberOfCards; i++)
+        {
+            if (cards.Count > 0)
+            {
+                hand.Add(cards[0]);
+                cards.RemoveAt(0);
+            }
+        }
+
+        return hand;
+    }
+
+    public int CardsRemaining()
+    {
+        return cards.Count;
+    }
 }
