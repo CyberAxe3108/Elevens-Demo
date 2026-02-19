@@ -1,51 +1,41 @@
-using System.ComponentModel.DataAnnotations;
+namespace Elevens.core;
 
-public class Deck {
-    private List<Card> cards = new List<Card>();
-    private Random random = new Random();
+public sealed class Deck {
+    private readonly List<Card> cards = new();
+    public int Count => cards.Count;
+
+    public bool IsEmpty => cards.Count == 0;
     public Deck()
     {
-        for (int i = 0; i < Card.suits.Length; i++)
+        foreach (var suit in Card.suits)
         {
-            for (int j = 1; j < Card.values.Length; j++)
+            for (int value = 1; value <= 13; value++)
             {
-                cards.Add(new Card(Card.values[j], Card.suits[i]));
+                cards.Add(new Card(value, suit));
             }
         }
+        Shuffle();
     }
-    private void Shuffle()
+    public void Shuffle()
     {
-        int n = cards.Count;
-        for (int i = n - 1; i > 0; i--)
+        Random random = new Random();
+        for (int i =cards.Count; i > 0; i--)
         {
-            int j = random.Next(i + 1);
+            int j = random.Next(0, i +1);
             Card temp = cards[i];
             cards[i] = cards[j];
             cards[j] = temp;
         }
     }
- public List<Card> Deal(int numberOfCards)
+ public Card DealCard()
     {
-        Shuffle();
-
-        numberOfCards = Math.Min(numberOfCards, 9);
-
-        List<Card> hand = new List<Card>();
-
-        for (int i = 0; i < numberOfCards; i++)
+        if (cards.Count == 0)
         {
-            if (cards.Count > 0)
-            {
-                hand.Add(cards[0]);
-                cards.RemoveAt(0);
-            }
+            throw new InvalidOperationException("No cards left to deal.");
         }
-
-        return hand;
+        Card top = cards[Count - 1];
+        cards.RemoveAt(Count - 1);
+        return top;
     }
-
-    public int CardsRemaining()
-    {
-        return cards.Count;
-    }
+    
 }
