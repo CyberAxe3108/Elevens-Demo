@@ -1,41 +1,37 @@
-namespace Elevens.core;
+namespace Elevens;
 
-public sealed class Deck {
-    private readonly List<Card> cards = new();
-    public int Count => cards.Count;
+public class Deck
+{
+    private List<Card> _cards;
 
-    public bool IsEmpty => cards.Count == 0;
+    public int Count => _cards.Count;
+
     public Deck()
     {
-        foreach (var suit in Card.suits)
-        {
-            for (int value = 1; value <= 13; value++)
-            {
-                cards.Add(new Card(value, suit));
-            }
-        }
-        Shuffle();
+        _cards = new List<Card>();
+        foreach (Suit suit in Enum.GetValues(typeof(Suit)))
+            for (int rank = 1; rank <= 13; rank++)
+                _cards.Add(new Card(rank, suit));
     }
+
+    public bool IsEmpty() => _cards.Count == 0;
+
     public void Shuffle()
     {
-        Random random = new Random();
-        for (int i =cards.Count; i > 0; i--)
+        var rng = new Random();
+        for (int i = _cards.Count - 1; i > 0; i--)
         {
-            int j = random.Next(0, i +1);
-            Card temp = cards[i];
-            cards[i] = cards[j];
-            cards[j] = temp;
+            int j = rng.Next(i + 1);
+            (_cards[i], _cards[j]) = (_cards[j], _cards[i]);
         }
     }
- public Card DealCard()
+
+    public Card DealCard()
     {
-        if (cards.Count == 0)
-        {
-            throw new InvalidOperationException("No cards left to deal.");
-        }
-        Card top = cards[Count - 1];
-        cards.RemoveAt(Count - 1);
-        return top;
+        if (IsEmpty()) throw new InvalidOperationException("Deck is empty.");
+        var card = _cards[^1];
+        _cards.RemoveAt(_cards.Count - 1);
+        return card;
     }
-    
 }
+
