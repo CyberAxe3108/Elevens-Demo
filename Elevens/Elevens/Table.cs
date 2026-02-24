@@ -1,65 +1,30 @@
-namespace Elevens.core;
+namespace Elevens;
 
-public sealed class Table
+public class Table
 {
-    private readonly List<Card> CardsOnTable = new();
-    
-    public int maxCards {get;}
-    public IReadOnlyList<Card> Cards => CardsOnTable;
-    public Table(int maxCards = 9)
+    private List<Card> _visibleCards;
+
+    public int MaxCards { get; } = 9;
+    public IReadOnlyList<Card> Cards => _visibleCards.AsReadOnly();
+
+    public Table()
     {
-        if (maxCards <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maxCards));
-        MaxCards = maxCards;
-        }
+        _visibleCards = new List<Card>();
     }
 
-    public int Count => CardsOnTable.Count;
-    
-    public bool isEmpty => CardsOnTable.Count == 0;
+    public int Count() => _visibleCards.Count;
+    public bool IsEmpty() => _visibleCards.Count == 0;
 
-    public void AddCard(Card card)
-    {
-        if (CardsOnTable.Count >= MaxCards)
-        {
-            throw new InvalidOperationException("Table is full.");
-        }
-        CardsOnTable.Add(card);
-    }
+    public void AddCard(Card card) => _visibleCards.Add(card);
 
-    public GetCard(int index)
-    {
-        if (index < 0 || index >= CardsOnTable.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-        return CardsOnTable[index];
-    }
+    public Card GetCardAt(int index) => _visibleCards[index];
 
     public List<Card> GetCardsByIndices(IEnumerable<int> indices)
-    {
-        List<Card> selectedCards = new();
-        foreach (int index in indices)
-        {
-            if (index < 0 || index >= CardsOnTable.Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(indices));
-            }
-            selectedCards.Add(CardsOnTable[index]);
-        }
-        return selectedCards;
-    }
+        => indices.Select(i => _visibleCards[i]).ToList();
 
     public void RemoveCards(IEnumerable<Card> cards)
     {
-        foreach (var c in cards)
-        {
-            int removed = CardsOnTable.Remove(c);
-            if (!removed){
-                throw new InvalidOperationException("Card not found on the table.");
-            }
-        }
+        foreach (var card in cards)
+            _visibleCards.Remove(card);
     }
-
 }
